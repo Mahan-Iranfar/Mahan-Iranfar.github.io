@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>آشنایی با دنیای کامپیوتر و فناوری | ماهان ایران‌فر</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" />
+<style>
+  /* ============ RESET & BASE ============ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root{
+    --bg:#0B1020;
+    --bg-2:#0F1630;
+    --text:#E8EEFF;
+    --muted:#94A3B8;
+    --blue:#38BDF8;
+    --cyan:#00D9FF;
+    --green:#22D3AA;
+    --purple:#A855F7;
+    --pink:#F472B6;
+    --amber:#FBBF24;
+    --border:rgba(56,189,248,.15);
+    --glass:rgba(255,255,255,.04);
+    --radius:20px;
+  }
+  html, body { height:100%; overflow:hidden; }
+  body{
+    font-family:'Vazirmatn', system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    direction:rtl;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  /* ============ ANIMATED BACKGROUND ============ */
+  .bg{
+    position:fixed; inset:0; z-index:0; overflow:hidden;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(56,189,248,.12), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(34,211,170,.10), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(168,85,247,.06), transparent 60%),
+      var(--bg);
+  }
+  .bg::before{
+    content:''; position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size:64px 64px;
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 25%, transparent 75%);
+    mask-image: radial-gradient(ellipse at center, #000 25%, transparent 75%);
+  }
+  .orb{ position:absolute; border-radius:50%; filter:blur(90px); opacity:.45; animation:float 22s ease-in-out infinite; }
+  .orb-1{ width:420px; height:420px; background:#38BDF8; top:-120px; right:-120px; }
+  .orb-2{ width:380px; height:380px; background:#22D3AA; bottom:-120px; left:-100px; animation-delay:-7s; }
+  .orb-3{ width:320px; height:320px; background:#A855F7; top:40%; left:40%; animation-delay:-14s; opacity:.22; }
+  @keyframes float{
+    0%,100%{ transform:translate(0,0) scale(1); }
+    33%{ transform:translate(40px,-30px) scale(1.1); }
+    66%{ transform:translate(-30px,40px) scale(.95); }
+  }
+
+  /* ============ APP LAYOUT ============ */
+  .app{
+    position:relative; z-index:1;
+    height:100vh; height:100dvh;
+    display:grid;
+    grid-template-rows:auto 1fr auto;
+  }
+
+  /* TOPBAR */
+  .topbar{
+    display:flex; align-items:center; gap:18px;
+    padding:16px 32px;
+    border-bottom:1px solid rgba(255,255,255,.04);
+    backdrop-filter: blur(8px);
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-size:13px; font-weight:700; color:var(--muted);
+    letter-spacing:.02em; white-space:nowrap;
+  }
+  .brand .dot{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 12px var(--green);
+    animation:pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
+  .progress{
+    flex:1; height:4px; border-radius:999px; overflow:hidden;
+    background:rgba(255,255,255,.06);
+  }
+  .progress .bar{
+    height:100%; width:0;
+    background:linear-gradient(90deg, var(--blue), var(--green));
+    border-radius:999px;
+    box-shadow:0 0 14px rgba(56,189,248,.55);
+    transition: width .55s cubic-bezier(.4,0,.2,1);
+  }
+  .counter{
+    font-size:12px; color:var(--muted);
+    font-variant-numeric: tabular-nums;
+    letter-spacing:.08em; direction:ltr;
+    min-width:70px; text-align:center;
+  }
+
+  /* STAGE */
+  .stage{ position:relative; overflow:hidden; }
+  .slide{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:32px 6vw;
+    opacity:0; visibility:hidden;
+    transform: translateY(24px) scale(.99);
+    transition: opacity .5s ease, transform .65s cubic-bezier(.2,.8,.2,1), visibility .5s;
+    overflow-y:auto;
+  }
+  .slide.active{ opacity:1; visibility:visible; transform:translateY(0) scale(1); }
+  .slide::-webkit-scrollbar{ width:6px; }
+  .slide::-webkit-scrollbar-thumb{ background:rgba(56,189,248,.25); border-radius:999px; }
+
+  /* NAVBAR */
+  .navbar{
+    display:flex; align-items:center; justify-content:center;
+    gap:16px; padding:14px 32px 20px;
+  }
+  .nav-btn{
+    width:48px; height:48px; border-radius:14px;
+    background: rgba(255,255,255,.04);
+    border:1px solid rgba(56,189,248,.18);
+    color: var(--text);
+    display:grid; place-items:center; cursor:pointer;
+    transition: all .25s ease;
+  }
+  .nav-btn:hover:not(:disabled){
+    background: rgba(56,189,248,.12);
+    border-color: rgba(56,189,248,.45);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -8px rgba(56,189,248,.5);
+  }
+  .nav-btn:disabled{ opacity:.3; cursor:not-allowed; }
+  .nav-btn svg{ width:20px; height:20px; stroke:currentColor; }
+  .dots{
+    display:flex; gap:6px; align-items:center; flex-wrap:wrap;
+    justify-content:center; max-width:60vw;
+  }
+  .dot-nav{
+    width:8px; height:8px; border-radius:50%;
+    background: rgba(255,255,255,.15);
+    border:none; cursor:pointer; padding:0;
+    transition: all .25s ease;
+  }
+  .dot-nav:hover{ background: rgba(255,255,255,.35); }
+  .dot-nav.active{
+    width:24px; border-radius:999px;
+    background: linear-gradient(90deg, var(--blue), var(--green));
+    box-shadow:0 0 12px rgba(56,189,248,.6);
+  }
+
+  /* ============ COMPONENTS ============ */
+  .kicker{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12px; font-weight:700; color:var(--blue);
+    padding:6px 14px; border-radius:999px;
+    background: rgba(56,189,248,.08);
+    border:1px solid rgba(56,189,248,.22);
+    margin-bottom:18px;
+    letter-spacing:.04em;
+    align-self:flex-start;
+  }
+  .kicker.green{ color:var(--green); background:rgba(34,211,170,.08); border-color:rgba(34,211,170,.22); }
+  .kicker.purple{ color:var(--purple); background:rgba(168,85,247,.08); border-color:rgba(168,85,247,.22); }
+  .kicker.amber{ color:var(--amber); background:rgba(251,191,36,.08); border-color:rgba(251,191,36,.22); }
+  .kicker.pink{ color:var(--pink); background:rgba(244,114,182,.08); border-color:rgba(244,114,182,.22); }
+
+  h1, h2, h3 { line-height:1.35; font-weight:800; letter-spacing:-.01em; }
+  .h-cover{ font-size: clamp(2.2rem, 5.2vw, 4.2rem); }
+  .h-1{ font-size: clamp(1.7rem, 3.6vw, 2.9rem); }
+  .h-2{ font-size: clamp(1.3rem, 2.4vw, 1.9rem); }
+  .h-3{ font-size: clamp(1.05rem, 1.6vw, 1.25rem); font-weight:700; }
+
+  .gradient-text{
+    background: linear-gradient(120deg, #38BDF8 0%, #22D3AA 50%, #A855F7 100%);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .glow{ text-shadow: 0 0 28px rgba(56,189,248,.35); }
+  .lead{ font-size: clamp(1rem, 1.7vw, 1.25rem); color:#CBD5E1; max-width: 820px; }
+  .muted{ color: var(--muted); }
+  .center{ text-align:center; align-items:center; }
+
+  /* Card / glass */
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.015));
+    border:1px solid rgba(255,255,255,.07);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    transition: all .3s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before{
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(circle at 0% 0%, rgba(56,189,248,.08), transparent 60%);
+    opacity:0; transition: opacity .3s ease; pointer-events:none;
+  }
+  .card:hover{ border-color: rgba(56,189,248,.35); transform: translateY(-3px); }
+  .card:hover::before{ opacity:1; }
+
+  .card-icon{
+    display:grid; place-items:center;
+    width:44px; height:44px; border-radius:12px;
+    background: rgba(56,189,248,.1);
+    border:1px solid rgba(56,189,248,.22);
+    font-size:22px; margin-bottom:12px;
+  }
+  .card-icon.green{ background:rgba(34,211,170,.1); border-color:rgba(34,211,170,.22); }
+  .card-icon.purple{ background:rgba(168,85,247,.1); border-color:rgba(168,85,247,.22); }
+  .card-icon.amber{ background:rgba(251,191,36,.1); border-color:rgba(251,191,36,.22); }
+  .card-icon.pink{ background:rgba(244,114,182,.1); border-color:rgba(244,114,182,.22); }
+
+  /* Chips */
+  .chip{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:999px;
+    background: rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.08);
+    font-size:13px; color:#CBD5E1;
+    transition: all .25s ease;
+  }
+  .chip:hover{ background: rgba(56,189,248,.1); border-color: rgba(56,189,248,.3); color:#fff; }
+  .chip.blue{ color:#7DD3FC; border-color:rgba(56,189,248,.25); background:rgba(56,189,248,.07); }
+  .chip.green{ color:#6EE7B7; border-color:rgba(34,211,170,.25); background:rgba(34,211,170,.07); }
+  .chip.purple{ color:#C4B5FD; border-color:rgba(168,85,247,.25); background:rgba(168,85,247,.07); }
+  .chip.amber{ color:#FCD34D; border-color:rgba(251,191,36,.25); background:rgba(251,191,36,.07); }
+  .chip.pink{ color:#F9A8D4; border-color:rgba(244,114,182,.25); background:rgba(244,114,182,.07); }
+
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
+
+  /* Grids */
+  .grid{ display:grid; gap:16px; }
+  .g-2{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .g-3{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .g-4{ grid-template-columns: repeat(4, minmax(0,1fr)); }
+  .g-5{ grid-template-columns: repeat(5, minmax(0,1fr)); }
+  @media (max-width: 900px){
+    .g-3, .g-4, .g-5{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .g-2{ grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px){
+    .g-3, .g-4, .g-5{ grid-template-columns: 1fr; }
+    .slide{ padding:24px 5vw; }
+    .topbar{ padding:12px 16px; }
+    .navbar{ padding:10px 16px 14px; }
+    .dots{ max-width:50vw; }
+  }
+
+  /* ============ SLIDE 1 - COVER ============ */
+  .cover-wrap{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:18px; }
+  .cover-badges{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:10px; }
+  .cover-instructor{
+    margin-top:34px; padding-top:22px;
+    border-top:1px solid rgba(255,255,255,.08);
+    display:flex; flex-direction:column; gap:4px; align-items:center;
+  }
+  .cover-instructor .name{ font-weight:800; font-size:1.05rem; }
+  .cover-instructor .role{ color:var(--muted); font-size:.9rem; }
+
+  /* ============ SLIDE 2 ============ */
+  .big-q{
+    font-size: clamp(2rem, 5.5vw, 4rem);
+    font-weight:900; text-align:center;
+    line-height:1.3;
+  }
+  .outcome-grid{ display:grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap:12px; margin-top:34px; }
+  @media (max-width: 900px){ .outcome-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px){ .outcome-grid{ grid-template-columns: 1fr; } }
+  .outcome{
+    padding:16px 12px; border-radius:16px; text-align:center;
+    background: rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.07);
+    transition: all .3s ease;
+  }
+  .outcome:hover{ transform: translateY(-4px); border-color: rgba(56,189,248,.4); background: rgba(56,189,248,.06); }
+  .outcome .emoji{ font-size:26px; display:block; margin-bottom:6px; }
+  .outcome .label{ font-size:13px; color:#CBD5E1; }
+
+  /* ============ SLIDE 3 - MINDMAP ============ */
+  .mindmap{ display:flex; flex-direction:column; align-items:center; gap:20px; width:100%; }
+  .mm-center{
+    display:flex; align-items:center; gap:14px;
+    padding: 16px 28px; border-radius:999px;
+    background: linear-gradient(90deg, rgba(56,189,248,.18), rgba(34,211,170,.18));
+    border: 1px solid rgba(56,189,248,.4);
+    font-weight:800; font-size:1.15rem;
+    box-shadow: 0 0 40px -10px rgba(56,189,248,.5);
+  }
+  .mm-line{ width:2px; height:28px; background: linear-gradient(180deg, rgba(56,189,248,.6), rgba(34,211,170,.05)); }
+  .mm-grid{
+    display:grid; grid-template-columns: repeat(3, minmax(0,1fr));
+    gap:12px; width:100%; max-width:780px;
+  }
+  .mm-node{
+    padding:14px 16px; border-radius:14px;
+    background: rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    display:flex; align-items:center; gap:10px;
+    font-size:14px; font-weight:600;
+    transition: all .25s ease;
+  }
+  .mm-node:hover{ border-color: rgba(56,189,248,.4); background: rgba(56,189,248,.06); }
+  .mm-node .e{ font-size:20px; }
+  @media (max-width: 640px){ .mm-grid{ grid-template-columns: repeat(2, 1fr); } }
+
+  /* ============ SLIDE 4 - TIMELINE ============ */
+  .timeline{
+    display:flex; gap:14px; overflow-x:auto; padding: 24px 4px;
+    scrollbar-width: thin;
+    position:relative;
+  }
+  .timeline::-webkit-scrollbar{ height:8px; }
+  .timeline::-webkit-scrollbar-thumb{ background: rgba(56,189,248,.25); border-radius:999px; }
+  .tl-item{
+    flex: 0 0 auto; min-width:132px; text-align:center;
+    padding:16px 12px; border-radius:16px;
+    background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.01));
+    border:1px solid rgba(255,255,255,.08);
+    position:relative;
+    transition: all .25s ease;
+  }
+  .tl-item::after{
+    content:''; position:absolute; top:50%; left:-14px; width:14px; height:2px;
+    background: linear-gradient(90deg, transparent, rgba(56,189,248,.5));
+  }
+  .tl-item:first-child::after{ display:none; }
+  .tl-item:hover{ border-color: rgba(56,189,248,.45); transform: translateY(-4px); }
+  .tl-num{
+    position:absolute; top:8px; left:8px;
+    font-size:10px; color:var(--muted); font-weight:700;
+    direction:ltr;
+  }
+  .tl-icon{ font-size:26px; display:block; margin-bottom:8px; }
+  .tl-label{ font-size:13px; font-weight:600; color:#CBD5E1; }
+
+  /* ============ SLIDE 5 - LEARN TRY BUILD ============ */
+  .ltb{
+    display:flex; align-items:center; justify-content:center; gap:16px;
+    margin-top: 30px; flex-wrap:wrap;
+  }
+  .ltb-step{
+    flex:1; min-width: 180px; max-width: 260px;
+    padding:22px 20px; border-radius:18px;
+    background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015));
+    border:1px solid rgba(255,255,255,.08);
+    text-align:center;
+    position:relative;
+  }
+  .ltb-step .num{
+    position:absolute; top:-14px; right:20px;
+    width:28px; height:28px; border-radius:50%;
+    background: linear-gradient(135deg, var(--blue), var(--green));
+    color:#04121f; font-weight:800; font-size:13px;
+    display:grid; place-items:center;
+    box-shadow: 0 0 18px rgba(56,189,248,.5);
+  }
+  .ltb-step h3{ margin-bottom:6px; }
+  .ltb-step p{ color:var(--muted); font-size:13px; }
+  .ltb-arrow{ font-size:24px; color: var(--blue); opacity:.6; }
+
+  /* ============ SLIDE 6 - CHECKLIST ============ */
+  .checklist{ display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; margin-top:24px; }
+  @media (max-width:640px){ .checklist{ grid-template-columns:1fr; } }
+  .check{
+    display:flex; align-items:center; gap:12px;
+    padding:14px 16px; border-radius:14px;
+    background: rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.07);
+    font-size:14px;
+  }
+  .check .tick{
+    width:24px; height:24px; border-radius:8px;
+    background: rgba(34,211,170,.12);
+    border:1px solid rgba(34,211,170,.35);
+    color: var(--green);
+    display:grid; place-items:center; font-size:13px; font-weight:900;
+    flex-shrink:0;
+  }
+
+  /* ============ CHAPTER COVER SLIDE ============ */
+  .chapter-hero{
+    display:flex; flex-direction:column; align-items:flex-start; gap:6px;
+    margin-bottom: 22px;
+  }
+  .chapter-hero .num{
+    font-size: 13px; font-weight:800; letter-spacing:.15em;
+    color: var(--blue); text-transform: uppercase; direction:ltr;
+  }
+  .chapter-hero h1{ font-size: clamp(2rem, 4.5vw, 3.4rem); }
+  .chapter-hero .sub{ color:var(--muted); font-size:1rem; }
+
+  /* ============ SLIDE 8 - INTERNET DIAGRAM ============ */
+  .flow{
+    display:flex; align-items:center; justify-content:center;
+    gap:12px; flex-wrap:wrap;
+    margin-top: 22px;
+  }
+  .flow-node{
+    padding:14px 18px; border-radius:14px;
+    background: rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.09);
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    font-size:13px; font-weight:600; min-width:110px;
+  }
+  .flow-node .e{ font-size:24px; }
+  .flow-arrow{ color: var(--blue); font-size:20px; opacity:.7; }
+
+  /* ============ SLIDE 12 - CODE BLOCK ============ */
+  .code-win{
+    background: #0A0F1F;
+    border: 1px solid rgba(56,189,248,.2);
+    border-radius: 14px;
+    overflow:hidden;
+    direction:ltr;
+    font-family: 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+    font-size: 13px;
+    box-shadow: 0 20px 60px -20px rgba(56,189,248,.3);
+  }
+  .code-head{
+    padding: 8px 14px;
+    background: rgba(255,255,255,.03);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    display:flex; gap:6px; align-items:center;
+  }
+  .code-head .dot{ width:10px; height:10px; border-radius:50%; }
+  .code-head .r{ background:#ff5f57; } .code-head .y{ background:#febc2e; } .code-head .g{ background:#28c840; }
+  .code-head .filename{ color:#94A3B8; font-size:11px; margin-right:auto; margin-left:auto; }
+  .code-body{ padding: 14px 16px; color:#CBD5E1; white-space: pre; overflow-x:auto; line-height:1.7; }
+  .code-body .t{ color:#7DD3FC; } /* tag */
+  .code-body .a{ color:#FCD34D; } /* attr */
+  .code-body .s{ color:#6EE7B7; } /* string */
+  .code-body .c{ color:#64748B; font-style:italic; } /* comment */
+
+  /* ============ SLIDE 13 - STAR ============ */
+  .star-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 14px; border-radius:999px;
+    background: linear-gradient(90deg, rgba(251,191,36,.15), rgba(244,114,182,.15));
+    border:1px solid rgba(251,191,36,.4);
+    color:#FCD34D; font-weight:700; font-size:12px;
+  }
+  .prompt-result{
+    display:grid; grid-template-columns: 1fr auto 1fr; gap:16px; align-items:center;
+    margin-top: 24px;
+  }
+  @media (max-width: 820px){ .prompt-result{ grid-template-columns:1fr; } .pr-arrow{ transform: rotate(90deg); } }
+  .prompt-box{
+    padding:18px; border-radius:14px;
+    background: #0A0F1F;
+    border:1px solid rgba(168,85,247,.3);
+    font-family: 'Fira Code', monospace; direction:ltr; text-align:left;
+    font-size:12.5px; color:#CBD5E1; line-height:1.7;
+  }
+  .prompt-box .lbl{ color:#C4B5FD; font-size:11px; display:block; margin-bottom:8px; }
+  .result-box{
+    padding:18px; border-radius:14px;
+    background: linear-gradient(180deg, rgba(34,211,170,.1), rgba(34,211,170,.02));
+    border:1px solid rgba(34,211,170,.35);
+    text-align:center;
+  }
+  .pr-arrow{ font-size:26px; color: var(--amber); }
+
+  /* ============ SLIDE 15 - AI STACK ============ */
+  .ai-stack{ display:flex; flex-direction:column; gap:8px; align-items:center; margin-top:20px; }
+  .ai-level{
+    padding:14px 22px; border-radius:14px;
+    background: linear-gradient(90deg, rgba(168,85,247,.12), rgba(168,85,247,.03));
+    border:1px solid rgba(168,85,247,.3);
+    font-weight:700; min-width: 240px; text-align:center;
+  }
+  .ai-level:nth-child(3){ background: linear-gradient(90deg, rgba(56,189,248,.14), rgba(56,189,248,.03)); border-color: rgba(56,189,248,.35); }
+  .ai-level:nth-child(5){ background: linear-gradient(90deg, rgba(34,211,170,.14), rgba(34,211,170,.03)); border-color: rgba(34,211,170,.35); }
+  .ai-level:nth-child(7){ background: linear-gradient(90deg, rgba(251,191,36,.14), rgba(251,191,36,.03)); border-color: rgba(251,191,36,.35); }
+  .ai-level:nth-child(9){ background: linear-gradient(90deg, rgba(244,114,182,.14), rgba(244,114,182,.03)); border-color: rgba(244,114,182,.35); }
+  .ai-down{ color:var(--muted); font-size:16px; }
+
+  /* ============ SLIDE 17 - SECURITY GAME ============ */
+  .game-card{
+    padding:22px; border-radius:16px; margin-top:14px;
+    background: linear-gradient(180deg, rgba(244,114,182,.08), rgba(244,114,182,.02));
+    border:1px solid rgba(244,114,182,.3);
+  }
+  .game-card .msg{
+    padding:14px 16px; border-radius:12px;
+    background: rgba(0,0,0,.25);
+    border:1px dashed rgba(255,255,255,.15);
+    font-size:14px; line-height:1.9;
+  }
+  .game-card .why{ margin-top:10px; color:var(--pink); font-size:13px; font-weight:600; }
+
+  /* ============ SLIDE 19 - CAREER CARDS ============ */
+  .career{
+    padding:16px 12px; border-radius:14px;
+    background: rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    text-align:center; font-size:13px; font-weight:600;
+    transition: all .3s ease;
+  }
+  .career:hover{
+    border-color: rgba(56,189,248,.4);
+    background: rgba(56,189,248,.06);
+    transform: translateY(-4px);
+  }
+  .career .e{ font-size:24px; display:block; margin-bottom:6px; }
+
+  /* ============ SLIDE 20 - MOTIVATION ============ */
+  .tomorrow{
+    display:grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 26px;
+    align-items:stretch;
+  }
+  @media (max-width: 720px){ .tomorrow{ grid-template-columns: 1fr; } }
+  .tomorrow .cell{
+    padding: 22px; border-radius: 16px;
+    border:1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.03);
+  }
+  .tomorrow .today{ border-color: rgba(148,163,184,.25); }
+  .tomorrow .future{ border-color: rgba(34,211,170,.4); background: rgba(34,211,170,.05); }
+  .tomorrow .label{
+    font-size:12px; font-weight:800; letter-spacing:.15em;
+    text-transform: uppercase; margin-bottom:10px;
+  }
+  .tomorrow .today .label{ color: var(--muted); }
+  .tomorrow .future .label{ color: var(--green); }
+  .tomorrow p{ font-size: 1.05rem; font-weight:600; }
+
+  /* ============ SLIDE 21 - RULES ============ */
+  .rules-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px; }
+  @media (max-width:640px){ .rules-grid{ grid-template-columns:1fr; } }
+  .rule-col{ padding:18px; border-radius:16px; border:1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.03); }
+  .rule-col.no{ border-color: rgba(244,114,182,.25); background: rgba(244,114,182,.04); }
+  .rule-col.yes{ border-color: rgba(34,211,170,.3); background: rgba(34,211,170,.05); }
+  .rule-col h3{ margin-bottom:12px; font-size:1rem; }
+  .rule-col.no h3{ color: var(--pink); }
+  .rule-col.yes h3{ color: var(--green); }
+  .rule{ padding:8px 0; font-size:14px; display:flex; gap:8px; align-items:center; }
+
+  /* ============ SLIDE 22 - FINALE ============ */
+  .finale{
+    display:flex; flex-direction:column; align-items:center; text-align:center; gap:20px;
+  }
+  .finale-chips{
+    display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:820px;
+  }
+  .finale-big{
+    font-size: clamp(1.6rem, 3.6vw, 2.6rem); font-weight:900; margin-top: 14px;
+    padding-top: 20px; border-top: 1px solid rgba(255,255,255,.1);
+  }
+  .finale-build{
+    font-size: clamp(2rem, 5vw, 3.6rem); font-weight:900;
+    background: linear-gradient(120deg, #38BDF8, #22D3AA, #A855F7);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent;
+    filter: drop-shadow(0 0 40px rgba(56,189,248,.35));
+  }
+
+  /* helper spacing */
+  .stack{ display:flex; flex-direction:column; gap:14px; }
+  .row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .between{ display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
+  .mt-l{ margin-top:26px; } .mt-m{ margin-top:18px; } .mt-s{ margin-top:10px; }
+  .mb-m{ margin-bottom:18px; }
+
+  /* focus visibility */
+  :focus-visible{ outline:2px solid var(--blue); outline-offset:3px; border-radius:6px; }
+
+  /* reduce motion */
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; transition-duration:.15s !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<div class="app">
+  <!-- ===== TOPBAR ===== -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span>آشنایی با دنیای کامپیوتر و فناوری</span>
+    </div>
+    <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
+    <div class="counter" id="counter" dir="ltr">01 / 22</div>
+  </header>
+
+  <!-- ===== STAGE ===== -->
+  <main class="stage" id="stage">
+
+    <!-- 01 Cover -->
+    <section class="slide active">
+      <div class="cover-wrap">
+        <span class="kicker">🎓 دوره آشنایی با دنیای فناوری</span>
+        <h1 class="h-cover">
+          آشنایی با <span class="gradient-text">دنیای کامپیوتر</span> و فناوری
+        </h1>
+        <p class="lead">
+          از اینترنت و وب تا برنامه‌نویسی، هوش مصنوعی و کسب‌وکار دیجیتال
+        </p>
+        <div class="cover-badges">
+          <span class="chip blue">🌐 Internet + Web</span>
+          <span class="chip green">💻 Code</span>
+          <span class="chip purple">🤖 AI</span>
+          <span class="chip amber">🔐 Cybersecurity</span>
+          <span class="chip pink">💰 Digital Business</span>
+        </div>
+        <div class="cover-instructor">
+          <span class="muted" style="font-size:13px;">مدرس</span>
+          <span class="name">ماهان ایران‌فر</span>
+          <span class="role">Full-Stack Developer · Software Engineer</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 Big question -->
+    <section class="slide">
+      <div class="center" style="display:flex; flex-direction:column;">
+        <span class="kicker">❓ سؤال شروع کلاس</span>
+        <h1 class="big-q glow">🤔 کامپیوتر واقعاً چیست؟</h1>
+        <p class="lead mt-m">
+          آیا کامپیوتر فقط یک وسیله برای بازی، فیلم دیدن و جستجو در اینترنت است؟
+        </p>
+        <p class="mt-l muted" style="font-size:13px; letter-spacing:.1em;">یا می‌توانیم با آن...</p>
+        <div class="outcome-grid">
+          <div class="outcome"><span class="emoji">🌐</span><span class="label">وب‌سایت بسازیم</span></div>
+          <div class="outcome"><span class="emoji">🤖</span><span class="label">هوش مصنوعی بسازیم</span></div>
+          <div class="outcome"><span class="emoji">💻</span><span class="label">نرم‌افزار بسازیم</span></div>
+          <div class="outcome"><span class="emoji">🎮</span><span class="label">بازی بسازیم</span></div>
+          <div class="outcome"><span class="emoji">💰</span><span class="label">کسب‌وکار راه بیندازیم</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 Mind map -->
+    <section class="slide">
+      <span class="kicker green">🌍 نقشه صنعت فناوری</span>
+      <h1 class="h-1 mb-m">کامپیوتر فقط «کامپیوتر» نیست!</h1>
+      <div class="mindmap">
+        <div class="mm-center"><span style="font-size:22px;">💻</span> Computer</div>
+        <div class="mm-line"></div>
+        <div class="mm-grid">
+          <div class="mm-node"><span class="e">🌐</span> Web</div>
+          <div class="mm-node"><span class="e">📱</span> Mobile</div>
+          <div class="mm-node"><span class="e">🎮</span> Game</div>
+          <div class="mm-node"><span class="e">🤖</span> AI</div>
+          <div class="mm-node"><span class="e">☁️</span> Cloud</div>
+          <div class="mm-node"><span class="e">🔐</span> Security</div>
+          <div class="mm-node"><span class="e">📊</span> Data</div>
+          <div class="mm-node"><span class="e">⚙️</span> Automation</div>
+          <div class="mm-node"><span class="e">💼</span> Business</div>
+        </div>
+      </div>
+      <p class="lead mt-l muted">
+        صنعت فناوری از حوزه‌های بسیار مختلفی تشکیل شده و برنامه‌نویسی تنها یکی از بخش‌های آن است.
+      </p>
+    </section>
+
+    <!-- 04 Timeline -->
+    <section class="slide">
+      <span class="kicker">🧭 مسیر کلاس</span>
+      <h1 class="h-1 mb-m">مسیر ما در این کلاس</h1>
+      <div class="timeline" id="timeline">
+        <div class="tl-item"><span class="tl-num">01</span><span class="tl-icon">🖥️</span><span class="tl-label">کامپیوتر</span></div>
+        <div class="tl-item"><span class="tl-num">02</span><span class="tl-icon">🌐</span><span class="tl-label">اینترنت و وب</span></div>
+        <div class="tl-item"><span class="tl-num">03</span><span class="tl-icon">✍️</span><span class="tl-label">وبلاگ</span></div>
+        <div class="tl-item"><span class="tl-num">04</span><span class="tl-icon">👨‍💻</span><span class="tl-label">برنامه‌نویسی</span></div>
+        <div class="tl-item"><span class="tl-num">05</span><span class="tl-icon">🌐</span><span class="tl-label">ساخت سایت</span></div>
+        <div class="tl-item"><span class="tl-num">06</span><span class="tl-icon">🤖</span><span class="tl-label">ساخت سایت با AI</span></div>
+        <div class="tl-item"><span class="tl-num">07</span><span class="tl-icon">📱</span><span class="tl-label">تولید محتوا</span></div>
+        <div class="tl-item"><span class="tl-num">08</span><span class="tl-icon">🧠</span><span class="tl-label">هوش مصنوعی</span></div>
+        <div class="tl-item"><span class="tl-num">09</span><span class="tl-icon">💰</span><span class="tl-label">کسب‌وکار</span></div>
+        <div class="tl-item"><span class="tl-num">10</span><span class="tl-icon">🔐</span><span class="tl-label">امنیت</span></div>
+      </div>
+      <p class="lead mt-l center" style="align-self:center;">
+        <strong class="gradient-text">در هر مرحله قرار نیست فقط یاد بگیریم؛ قرار است چیزی بسازیم.</strong>
+      </p>
+    </section>
+
+    <!-- 05 Learn Try Build -->
+    <section class="slide">
+      <span class="kicker green">🛠️ روش کلاس</span>
+      <h1 class="h-1">این کلاس فقط تئوری نیست!</h1>
+      <div class="ltb">
+        <div class="ltb-step"><span class="num">۱</span><h3 class="h-3">یاد می‌گیریم</h3><p>یک مفهوم جدید را می‌شناسیم.</p></div>
+        <span class="ltb-arrow">→</span>
+        <div class="ltb-step"><span class="num">۲</span><h3 class="h-3">انجام می‌دهیم</h3><p>همان مفهوم را با ابزار واقعی امتحان می‌کنیم.</p></div>
+        <span class="ltb-arrow">→</span>
+        <div class="ltb-step"><span class="num">۳</span><h3 class="h-3">می‌سازیم</h3><p>در نهایت یک محصول کوچک ایجاد می‌کنیم.</p></div>
+      </div>
+      <p class="center mt-l" style="align-self:center; font-size:clamp(1.4rem,3vw,2.2rem); font-weight:900;">
+        <span class="gradient-text">Learn ← Try ← Build</span>
+      </p>
+    </section>
+
+    <!-- 06 Outcomes -->
+    <section class="slide">
+      <span class="kicker green">🎯 خروجی کلاس</span>
+      <h1 class="h-1">در پایان کلاس چه چیزی دارم؟</h1>
+      <div class="checklist">
+        <div class="check"><span class="tick">✓</span> یک وبلاگ ساخته‌ام</div>
+        <div class="check"><span class="tick">✓</span> یک صفحه وب ساخته‌ام</div>
+        <div class="check"><span class="tick">✓</span> با مفاهیم برنامه‌نویسی آشنا شده‌ام</div>
+        <div class="check"><span class="tick">✓</span> یک سایت با کمک AI ساخته‌ام</div>
+        <div class="check"><span class="tick">✓</span> محتوای دیجیتال تولید کرده‌ام</div>
+        <div class="check"><span class="tick">✓</span> با ابزارهای AI کار کرده‌ام</div>
+        <div class="check"><span class="tick">✓</span> یک ایده کسب‌وکار دیجیتال طراحی کرده‌ام</div>
+        <div class="check"><span class="tick">✓</span> با اصول اولیه امنیت آنلاین آشنا شده‌ام</div>
+      </div>
+    </section>
+
+    <!-- 07 Chapter 1 -->
+    <section class="slide">
+      <div class="chapter-hero">
+        <span class="num">Chapter 01</span>
+        <h1>🖥️ دنیای کامپیوتر</h1>
+        <span class="sub">آشنایی با صنعت کامپیوتر و شناخت مسیرهای مختلف آن</span>
+      </div>
+      <div class="grid g-2">
+        <div class="card"><div class="card-icon">💻</div><h3 class="h-3">کامپیوتر چیست؟</h3><p class="muted" style="font-size:13px;">سخت‌افزار و نرم‌افزار</p></div>
+        <div class="card"><div class="card-icon green">⚙️</div><h3 class="h-3">سیستم‌عامل و Application</h3><p class="muted" style="font-size:13px;">Software چیست؟</p></div>
+        <div class="card"><div class="card-icon purple">👨‍💻</div><h3 class="h-3">برنامه‌نویس چه می‌کند؟</h3><p class="muted" style="font-size:13px;">مهندس نرم‌افزار کیست؟</p></div>
+        <div class="card"><div class="card-icon amber">🌍</div><h3 class="h-3">حوزه‌های مختلف فناوری</h3><p class="muted" style="font-size:13px;">از وب تا AI و امنیت</p></div>
+      </div>
+    </section>
+
+    <!-- 08 Internet -->
+    <section class="slide">
+      <div class="chapter-hero">
+        <span class="num">Chapter 02</span>
+        <h1>🌐 اینترنت و وب</h1>
+        <span class="sub">وب چگونه کار می‌کند، نه اینکه فقط از آن استفاده کنیم.</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip blue">Internet</span>
+        <span class="chip blue">Web</span>
+        <span class="chip blue">Browser</span>
+        <span class="chip blue">Search Engine</span>
+        <span class="chip blue">Website</span>
+        <span class="chip blue">URL</span>
+        <span class="chip blue">Domain</span>
+        <span class="chip blue">Hosting</span>
+        <span class="chip blue">Server</span>
+      </div>
+      <div class="flow">
+        <div class="flow-node"><span class="e">👨‍💻</span> User</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">🌐</span> Browser</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">📡</span> Internet</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">🖥️</span> Server</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">📄</span> Website</div>
+      </div>
+      <p class="lead mt-l muted">
+        وقتی آدرس یک سایت را در Chrome وارد می‌کنیم، پشت صحنه چه اتفاقی می‌افتد؟
+      </p>
+    </section>
+
+    <!-- 09 Blog -->
+    <section class="slide">
+      <div class="chapter-hero">
+        <span class="num">Chapter 03</span>
+        <h1>✍️ وبلاگ‌نویسی</h1>
+        <span class="sub">اولین تجربه واقعی انتشار محتوا در اینترنت</span>
+      </div>
+      <div class="grid g-2">
+        <div class="card">
+          <div class="card-icon">📝</div>
+          <h3 class="h-3">چه چیزی می‌سازیم؟</h3>
+          <p class="gradient-text" style="font-weight:900; font-size:1.3rem; margin-top:6px;">«وبلاگ شخصی من»</p>
+          <div class="chip-row mt-m">
+            <span class="chip">Blog چیست؟</span>
+            <span class="chip">انتخاب موضوع</span>
+            <span class="chip">نوشتن مطلب</span>
+            <span class="chip">تصویر و لینک</span>
+            <span class="chip">انتشار مطلب</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-icon green">🚀</div>
+          <h3 class="h-3">ابزار</h3>
+          <p style="font-size:1.6rem; font-weight:900; color:var(--green); margin-top:6px;">Blogfa</p>
+          <p class="muted mt-m" style="font-size:14px;">
+            اولین تجربه واقعی دانش‌آموز از انتشار محتوا در اینترنت.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 Programming -->
+    <section class="slide">
+      <div class="chapter-hero">
+        <span class="num">Chapter 04</span>
+        <h1>👨‍💻 دنیای برنامه‌نویسی</h1>
+        <span class="sub">نرم‌افزارها چطور ساخته می‌شوند؟</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip purple">Programming</span>
+        <span class="chip purple">Programming Language</span>
+        <span class="chip purple">Python</span>
+        <span class="chip purple">JavaScript</span>
+        <span class="chip purple">HTML / CSS</span>
+        <span class="chip purple">Frontend</span>
+        <span class="chip purple">Backend</span>
+        <span class="chip purple">Database</span>
+        <span class="chip purple">API</span>
+        <span class="chip purple">Full-Stack</span>
+      </div>
+      <div class="card mt-l" style="border-color:rgba(168,85,247,.3);">
+        <p style="font-size:1.05rem; font-weight:600;">
+          در این کلاس قرار نیست برنامه‌نویس حرفه‌ای شویم؛
+          <span class="gradient-text">قرار است بفهمیم دنیای برنامه‌نویسی چگونه کار می‌کند.</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- 11 Programmer builds what -->
+    <section class="slide">
+      <span class="kicker purple">👨‍💻 یک برنامه‌نویس چه کار می‌کند؟</span>
+      <h1 class="h-1 mb-m">اگر تو برنامه‌نویس بودی، چه می‌ساختی؟</h1>
+      <div class="grid g-4">
+        <div class="career"><span class="e">🌐</span>Website</div>
+        <div class="career"><span class="e">📱</span>Mobile App</div>
+        <div class="career"><span class="e">🎮</span>Game</div>
+        <div class="career"><span class="e">🤖</span>AI</div>
+        <div class="career"><span class="e">⚙️</span>Automation</div>
+        <div class="career"><span class="e">💾</span>Software</div>
+        <div class="career"><span class="e">📊</span>Data</div>
+        <div class="career"><span class="e">🚀</span>Startup</div>
+      </div>
+    </section>
+
+    <!-- 12 Web design -->
+    <section class="slide">
+      <div class="chapter-hero">
+        <span class="num">Chapter 05</span>
+        <h1>🎨 طراحی و ساخت وب‌سایت</h1>
+        <span class="sub">پروژه: «صفحه وب من»</span>
+      </div>
+      <div class="grid g-2" style="align-items:center;">
+        <div class="code-win">
+          <div class="code-head">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="filename">index.html</span>
+          </div>
+          <div class="code-body"><span class="c">&lt;!-- صفحه وب من --&gt;</span>
+<span class="t">&lt;h1&gt;</span>سلام، من ماهان هستم!<span class="t">&lt;/h1&gt;</span>
+<span class="t">&lt;p&gt;</span>این اولین صفحه وب منه.<span class="t">&lt;/p&gt;</span>
+<span class="t">&lt;a</span> <span class="a">href</span>=<span class="s">"about.html"</span><span class="t">&gt;</span>درباره من<span class="t">&lt;/a&gt;</span></div>
+        </div>
+        <div>
+          <span class="chip-row">
+            <span class="chip blue">HTML</span>
+            <span class="chip blue">CSS</span>
+            <span class="chip blue">متن</span>
+            <span class="chip blue">تصویر</span>
+            <span class="chip blue">لینک</span>
+            <span class="chip blue">Button</span>
+            <span class="chip blue">رنگ</span>
+            <span class="chip blue">فونت</span>
+            <span class="chip blue">Layout</span>
+            <span class="chip blue">Landing Page</span>
+          </span>
+          <p class="lead mt-m">
+            پروژه: معرفی خودم / مدرسه / یک محصول / یک کسب‌وکار
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 AI website ⭐ -->
+    <section class="slide">
+      <div class="row between mb-m">
+        <div class="chapter-hero" style="margin:0;">
+          <span class="num">Chapter 06</span>
+          <h1>🤖 ساخت اولین سایت با هوش مصنوعی</h1>
+        </div>
+        <span class="star-badge">⭐ ستاره دوره</span>
+      </div>
+      <p class="lead">
+        آیا برای ساخت یک سایت حتماً باید برنامه‌نویس حرفه‌ای باشیم؟
+        <strong class="gradient-text">بیایید امتحان کنیم!</strong>
+      </p>
+      <div class="chip-row mt-m">
+        <span class="chip purple">AI چیست؟</span>
+        <span class="chip purple">Generative AI</span>
+        <span class="chip purple">Prompt</span>
+        <span class="chip purple">AI Coding</span>
+        <span class="chip purple">ساخت HTML/CSS با AI</span>
+        <span class="chip purple">اصلاح سایت با AI</span>
+      </div>
+      <div class="prompt-result">
+        <div class="prompt-box">
+          <span class="lbl">PROMPT →</span>
+          Create a modern landing page for a coffee shop with warm colors, hero section, menu and contact form.
+        </div>
+        <div class="pr-arrow">←</div>
+        <div class="result-box">
+          <div style="font-size:38px;">☕</div>
+          <p style="font-weight:800; font-size:1.05rem;">Landing Page</p>
+          <p class="muted" style="font-size:12px;">🚀 اولین پروژه با AI</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 Content -->
+    <section class="slide">
+      <div class="chapter-hero">
+        <span class="num">Chapter 07</span>
+        <h1>📱 تولید محتوا</h1>
+        <span class="sub">اینترنت فقط سایت نیست!</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip pink">متن</span>
+        <span class="chip pink">عکس</span>
+        <span class="chip pink">پوستر</span>
+        <span class="chip pink">ویدئو</span>
+        <span class="chip pink">کپشن</span>
+        <span class="chip pink">Thumbnail</span>
+        <span class="chip pink">AI</span>
+      </div>
+      <div class="flow mt-l">
+        <div class="flow-node"><span class="e">📦</span> Product</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">🎨</span> Poster</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">✍️</span> Caption</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">📱</span> Social Post</div>
+      </div>
+      <p class="lead mt-l muted">
+        آشنایی با دنیای Content Creation و رسانه دیجیتال.
+      </p>
+    </section>
+
+    <!-- 15 AI -->
+    <section class="slide">
+      <div class="chapter-hero">
+        <span class="num">Chapter 08</span>
+        <h1>🧠 هوش مصنوعی چیست؟</h1>
+        <span class="sub">مقدماتی، شفاف و بدون پیچیدگی</span>
+      </div>
+      <div class="grid g-2" style="align-items:start;">
+        <div class="ai-stack">
+          <div class="ai-level">🤖 AI</div>
+          <span class="ai-down">↓</span>
+          <div class="ai-level">📊 Machine Learning</div>
+          <span class="ai-down">↓</span>
+          <div class="ai-level">✨ Generative AI</div>
+          <span class="ai-down">↓</span>
+          <div class="ai-level">💬 Chatbot</div>
+          <span class="ai-down">↓</span>
+          <div class="ai-level">🎨 Image Generation</div>
+        </div>
+        <div class="stack">
+          <div class="card"><h3 class="h-3">🤔 آیا AI واقعاً فکر می‌کند؟</h3></div>
+          <div class="card"><h3 class="h-3">❓ آیا AI همیشه درست می‌گوید؟</h3></div>
+          <div class="card"><h3 class="h-3">👤 آیا AI جای انسان را می‌گیرد؟</h3></div>
+          <p class="muted" style="font-size:12.5px; line-height:1.9;">
+            تأکید بر تشخیص توانایی‌ها و محدودیت‌های AI، بررسی خروجی و مسئولیت انسانی.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 Business -->
+    <section class="slide">
+      <div class="chapter-hero">
+        <span class="num">Chapter 09</span>
+        <h1>💰 کسب‌وکار دیجیتال</h1>
+        <span class="sub">چطور می‌توان از فناوری یک کسب‌وکار ساخت؟</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip amber">Idea</span>
+        <span class="chip amber">Product</span>
+        <span class="chip amber">Customer</span>
+        <span class="chip amber">Website</span>
+        <span class="chip amber">Online Sales</span>
+        <span class="chip amber">Digital Marketing</span>
+        <span class="chip amber">Brand</span>
+        <span class="chip amber">AI</span>
+      </div>
+      <div class="flow mt-l">
+        <div class="flow-node"><span class="e">💡</span> ایده</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">🏷️</span> نام برند</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">📦</span> محصول</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">🎨</span> پوستر</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">🌐</span> Landing</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">📣</span> تبلیغ</div>
+      </div>
+    </section>
+
+    <!-- 17 Security -->
+    <section class="slide">
+      <div class="chapter-hero">
+        <span class="num">Chapter 10</span>
+        <h1>🔐 امنیت در دنیای دیجیتال</h1>
+        <span class="sub">فقط چیزهای ضروری</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip pink">🔑 Password قوی</span>
+        <span class="chip pink">📱 Two-Factor Auth</span>
+        <span class="chip pink">🎣 Phishing</span>
+        <span class="chip pink">🔗 لینک مشکوک</span>
+        <span class="chip pink">🕵️ اطلاعات شخصی</span>
+        <span class="chip pink">🔒 Privacy</span>
+        <span class="chip pink">🚨 Scam</span>
+      </div>
+      <div class="game-card">
+        <h3 class="h-3" style="color:var(--pink);">🎮 بازی: واقعی یا جعلی؟</h3>
+        <div class="msg mt-s">
+          «تبریک! شما برنده آیفون شدید. برای دریافت جایزه روی لینک زیر کلیک کنید.»
+        </div>
+        <p class="why">چرا مشکوک است؟</p>
+      </div>
+    </section>
+
+    <!-- 18 Final project -->
+    <section class="slide">
+      <span class="kicker amber">🚀 پروژه نهایی</span>
+      <h1 class="h-1 mb-m">پروژه نهایی من</h1>
+      <p class="lead">
+        یک ایده را به یک محصول دیجیتال کوچک تبدیل کن.
+      </p>
+      <div class="flow">
+        <div class="flow-node"><span class="e">💡</span> IDEA</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">🎨</span> DESIGN</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">🤖</span> AI</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">🌐</span> WEBSITE</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">📱</span> CONTENT</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">💰</span> BUSINESS</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-node"><span class="e">🎤</span> PRESENTATION</div>
+      </div>
+      <div class="chip-row mt-l">
+        <span class="chip">فروشگاه لباس</span>
+        <span class="chip">کافه</span>
+        <span class="chip">سایت مدرسه</span>
+        <span class="chip">سایت گردشگری گرگان</span>
+        <span class="chip">باشگاه ورزشی</span>
+        <span class="chip">فروشگاه کتاب</span>
+        <span class="chip">معرفی یک مهارت</span>
+        <span class="chip">کسب‌وکار خانوادگی</span>
+      </div>
+    </section>
+
+    <!-- 19 Careers -->
+    <section class="slide">
+      <span class="kicker blue">👨‍💻 مسیرهای شغلی</span>
+      <h1 class="h-1 mb-m">شاید شغل آینده تو همین‌جا باشد!</h1>
+      <div class="grid g-5">
+        <div class="career"><span class="e">🎨</span>Frontend Dev</div>
+        <div class="career"><span class="e">⚙️</span>Backend Dev</div>
+        <div class="career"><span class="e">🚀</span>Full-Stack Dev</div>
+        <div class="career"><span class="e">🤖</span>AI Engineer</div>
+        <div class="career"><span class="e">🖌️</span>UI/UX Designer</div>
+        <div class="career"><span class="e">🎮</span>Game Dev</div>
+        <div class="career"><span class="e">🔐</span>Cybersecurity</div>
+        <div class="career"><span class="e">📊</span>Data</div>
+        <div class="career"><span class="e">📱</span>Content Creator</div>
+        <div class="career"><span class="e">💼</span>Digital Entrepreneur</div>
+      </div>
+      <p class="lead mt-l center muted" style="align-self:center;">
+        لازم نیست امروز انتخاب کنی؛ <strong style="color:var(--text);">فقط باید مسیرها را بشناسی.</strong>
+      </p>
+    </section>
+
+    <!-- 20 Motivation -->
+    <section class="slide">
+      <span class="kicker green">🚀 از مصرف‌کننده به سازنده</span>
+      <h1 class="h-1">تکنولوژی را مصرف نکن؛ بساز!</h1>
+      <div class="tomorrow">
+        <div class="cell today">
+          <div class="label">👀 امروز</div>
+          <p>من از اینترنت استفاده می‌کنم.</p>
+          <p class="muted" style="margin-top:8px; font-size:14px;">من از AI استفاده می‌کنم.</p>
+        </div>
+        <div class="cell future">
+          <div class="label">🚀 فردا</div>
+          <p>من برای اینترنت چیزی می‌سازم.</p>
+          <p style="margin-top:8px; color:#6EE7B7; font-weight:700;">من با AI چیزی می‌سازم.</p>
+        </div>
+      </div>
+      <p class="center mt-l" style="align-self:center; font-size:clamp(1.2rem,2.6vw,1.8rem); font-weight:900;">
+        <span class="gradient-text">از کاربر تکنولوژی ← به سازنده تکنولوژی</span>
+      </p>
+    </section>
+
+    <!-- 21 Rules -->
+    <section class="slide">
+      <span class="kicker pink">📋 قوانین کلاس</span>
+      <h1 class="h-1">در کلاس ما:</h1>
+      <div class="rules-grid">
+        <div class="rule-col no">
+          <h3>❌ این کارها را نمی‌کنیم</h3>
+          <div class="rule">❌ فقط گوش نمی‌دهیم</div>
+          <div class="rule">❌ فقط جزوه نمی‌نویسیم</div>
+          <div class="rule">❌ از اشتباه کردن نمی‌ترسیم</div>
+        </div>
+        <div class="rule-col yes">
+          <h3>✅ این کارها را می‌کنیم</h3>
+          <div class="rule">✅ سؤال می‌پرسیم</div>
+          <div class="rule">✅ امتحان می‌کنیم</div>
+          <div class="rule">✅ خراب می‌کنیم</div>
+          <div class="rule">✅ Debug می‌کنیم</div>
+          <div class="rule">✅ دوباره می‌سازیم</div>
+        </div>
+      </div>
+      <p class="center mt-l" style="align-self:center; font-size:1.15rem; font-weight:800;">
+        <span class="gradient-text">اشتباه کردن بخشی از ساختن است.</span>
+      </p>
+    </section>
+
+    <!-- 22 Finale -->
+    <section class="slide">
+      <div class="finale">
+        <span class="kicker">🚀 آماده‌ای؟</span>
+        <h1 class="h-cover gradient-text">Let's Build!</h1>
+        <div class="finale-chips">
+          <span class="chip blue">🌐 اینترنت</span>
+          <span class="chip purple">👨‍💻 برنامه‌نویسی</span>
+          <span class="chip purple">🤖 هوش مصنوعی</span>
+          <span class="chip pink">🎨 طراحی</span>
+          <span class="chip amber">📱 تولید محتوا</span>
+          <span class="chip green">💰 کسب‌وکار</span>
+        </div>
+        <p class="finale-big">
+          و در نهایت... <span class="gradient-text">چیزی که خودت ساخته‌ای.</span>
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== NAVBAR ===== -->
+  <footer class="navbar">
+    <button class="nav-btn" id="prev" aria-label="اسلاید بعدی">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="dots" id="dots" role="tablist" aria-label="ناوبری اسلایدها"></div>
+    <button class="nav-btn" id="next" aria-label="اسلاید قبلی">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </footer>
+</div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  const bar = document.getElementById('bar');
+  const counter = document.getElementById('counter');
+  const dotsWrap = document.getElementById('dots');
+  const btnPrev = document.getElementById('prev');
+  const btnNext = document.getElementById('next');
+  let current = 0;
+
+  // build dots
+  slides.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.className = 'dot-nav';
+    b.setAttribute('role','tab');
+    b.setAttribute('aria-label', 'اسلاید ' + (i+1));
+    b.addEventListener('click', () => go(i));
+    dotsWrap.appendChild(b);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function updateUI(){
+    bar.style.width = ((current+1) / total * 100) + '%';
+    counter.textContent = pad(current+1) + ' / ' + pad(total);
+    dots.forEach((d,i) => d.classList.toggle('active', i === current));
+    // In RTL, "previous" button visually on the right should be disabled at start
+    btnPrev.disabled = current === 0;
+    btnNext.disabled = current === total - 1;
+    // keep active slide scrolled to top
+    slides[current].scrollTop = 0;
+  }
+
+  function go(n){
+    if (n < 0 || n >= total || n === current) return;
+    slides[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    updateUI();
+    try { history.replaceState(null, '', '#' + (current+1)); } catch(e){}
+  }
+
+  // Buttons: in RTL, prev (right arrow icon) = previous slide
+  btnPrev.addEventListener('click', () => go(current - 1));
+  btnNext.addEventListener('click', () => go(current + 1));
+
+  // Keyboard: RTL-aware
+  document.addEventListener('keydown', (e) => {
+    switch(e.key){
+      case 'ArrowRight': // RTL: right = back
+      case 'ArrowUp':
+        e.preventDefault(); go(current - 1); break;
+      case 'ArrowLeft':  // RTL: left = forward
+      case 'ArrowDown':
+      case ' ':
+      case 'PageDown':
+        e.preventDefault(); go(current + 1); break;
+      case 'PageUp':
+        e.preventDefault(); go(current - 1); break;
+      case 'Home':
+        e.preventDefault(); go(0); break;
+      case 'End':
+        e.preventDefault(); go(total - 1); break;
+    }
+  });
+
+  // Touch swipe
+  let touchX = 0, touchY = 0;
+  document.addEventListener('touchstart', (e) => {
+    touchX = e.changedTouches[0].clientX;
+    touchY = e.changedTouches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchX;
+    const dy = e.changedTouches[0].clientY - touchY;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy)) return;
+    // RTL: swipe right = next
+    if (dx > 0) go(current + 1);
+    else go(current - 1);
+  }, { passive: true });
+
+  // Hash sync on load
+  const hashN = parseInt(location.hash.slice(1), 10);
+  if (!isNaN(hashN) && hashN >= 1 && hashN <= total) {
+    slides[0].classList.remove('active');
+    current = hashN - 1;
+    slides[current].classList.add('active');
+  }
+  updateUI();
+})();
+</script>
+</body>
+</html>
